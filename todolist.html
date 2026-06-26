@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>To-Do List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f5f9;
+    --surface:#ffffff;
+    --border:#e4e6ee;
+    --text:#1d1f2b;
+    --text-muted:#7c8094;
+    --accent:#5b5bf0;
+    --accent-soft:#eceaff;
+    --danger:#ef4444;
+    --good:#22c55e;
+    --radius:14px;
+    --font:'Inter', sans-serif;
+    --display:'Sora', sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    font-family:var(--font);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:48px 18px;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:28px 26px 22px;
+    box-shadow:0 18px 40px -22px rgba(20,20,50,0.18);
+  }
+  header h1{
+    font-family:var(--display);
+    font-size:24px;
+    margin-bottom:4px;
+  }
+  header p{
+    color:var(--text-muted);
+    font-size:13.5px;
+    margin-bottom:20px;
+  }
+  .add-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:18px;
+  }
+  .add-row input{
+    flex:1;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    font-size:14.5px;
+    font-family:var(--font);
+    outline:none;
+    transition:border-color .15s;
+  }
+  .add-row input:focus{border-color:var(--accent);}
+  .add-row button{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius);
+    padding:0 18px;
+    font-family:var(--display);
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    transition:opacity .15s, transform .15s;
+  }
+  .add-row button:hover{opacity:.92;transform:translateY(-1px);}
+
+  .filters{
+    display:flex;
+    gap:6px;
+    margin-bottom:16px;
+  }
+  .filters button{
+    flex:1;
+    background:none;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:7px 0;
+    font-size:12.5px;
+    font-family:var(--font);
+    color:var(--text-muted);
+    cursor:pointer;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .filters button.active{
+    background:var(--accent-soft);
+    color:var(--accent);
+    border-color:var(--accent-soft);
+    font-weight:600;
+  }
+
+  ul#list{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-height:60px;
+  }
+  .task{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:11px 12px;
+    background:#fff;
+  }
+  .task .check{
+    width:19px;height:19px;border-radius:50%;
+    border:2px solid var(--border);
+    flex-shrink:0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .15s, background .15s;
+  }
+  .task.done .check{background:var(--good);border-color:var(--good);}
+  .task.done .check::after{content:'✓';color:#fff;font-size:11px;}
+  .task .label{
+    flex:1;
+    font-size:14.5px;
+    outline:none;
+    word-break:break-word;
+  }
+  .task.done .label{color:var(--text-muted);text-decoration:line-through;}
+  .task .actions{display:flex;gap:6px;opacity:0;transition:opacity .15s;}
+  .task:hover .actions{opacity:1;}
+  .task .actions button{
+    background:none;border:none;cursor:pointer;
+    font-size:13px;color:var(--text-muted);padding:4px;border-radius:6px;
+  }
+  .task .actions button:hover{color:var(--accent);}
+  .task .actions button.del:hover{color:var(--danger);}
+
+  .empty{
+    text-align:center;color:var(--text-muted);
+    font-size:13.5px;padding:26px 0;
+  }
+
+  footer.app-footer{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:12.5px;
+    color:var(--text-muted);
+  }
+  footer.app-footer button{
+    background:none;border:none;color:var(--text-muted);
+    cursor:pointer;font-size:12.5px;text-decoration:underline;
+  }
+  footer.app-footer button:hover{color:var(--danger);}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>To-Do List</h1>
+      <p>Add, edit, and check off tasks — saved automatically in your browser.</p>
+    </header>
+
+    <div class="add-row">
+      <input type="text" id="taskInput" placeholder="What needs to be done?" maxlength="200" />
+      <button id="addBtn">Add</button>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="active">Active</button>
+      <button class="filter-btn" data-filter="completed">Completed</button>
+    </div>
+
+    <ul id="list"></ul>
+    <p class="empty" id="emptyState" style="display:none;">Nothing here yet — add your first task above.</p>
+
+    <footer class="app-footer">
+      <span id="counter">0 tasks</span>
+      <button id="clearCompleted">Clear completed</button>
+    </footer>
+  </div>
+
+<script>
+  const STORAGE_KEY = 'todo-app-tasks';
+  let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let filter = 'all';
+
+  const listEl = document.getElementById('list');
+  const inputEl = document.getElementById('taskInput');
+  const addBtn = document.getElementById('addBtn');
+  const counterEl = document.getElementById('counter');
+  const emptyEl = document.getElementById('emptyState');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const clearBtn = document.getElementById('clearCompleted');
+
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }
+
+  function uid(){
+    return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  function addTask(text){
+    const trimmed = text.trim();
+    if(!trimmed) return;
+    tasks.push({ id: uid(), text: trimmed, done: false });
+    save();
+    render();
+  }
+
+  function deleteTask(id){
+    tasks = tasks.filter(t => t.id !== id);
+    save();
+    render();
+  }
+
+  function toggleTask(id){
+    const t = tasks.find(t => t.id === id);
+    if(t){ t.done = !t.done; save(); render(); }
+  }
+
+  function editTask(id, newText){
+    const t = tasks.find(t => t.id === id);
+    if(t){
+      const trimmed = newText.trim();
+      t.text = trimmed || t.text;
+      save();
+    }
+  }
+
+  function clearCompleted(){
+    tasks = tasks.filter(t => !t.done);
+    save();
+    render();
+  }
+
+  function render(){
+    let visible = tasks;
+    if(filter === 'active') visible = tasks.filter(t => !t.done);
+    if(filter === 'completed') visible = tasks.filter(t => t.done);
+
+    listEl.innerHTML = '';
+    visible.forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'task' + (t.done ? ' done' : '');
+
+      const check = document.createElement('div');
+      check.className = 'check';
+      check.addEventListener('click', () => toggleTask(t.id));
+
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = t.text;
+      label.contentEditable = 'true';
+      label.spellcheck = false;
+      label.addEventListener('blur', () => editTask(t.id, label.textContent));
+      label.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter'){ e.preventDefault(); label.blur(); }
+      });
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const delBtn = document.createElement('button');
+      delBtn.className = 'del';
+      delBtn.textContent = '✕';
+      delBtn.title = 'Delete task';
+      delBtn.addEventListener('click', () => deleteTask(t.id));
+      actions.appendChild(delBtn);
+
+      li.appendChild(check);
+      li.appendChild(label);
+      li.appendChild(actions);
+      listEl.appendChild(li);
+    });
+
+    emptyEl.style.display = visible.length === 0 ? 'block' : 'none';
+    const remaining = tasks.filter(t => !t.done).length;
+    counterEl.textContent = `${remaining} task${remaining === 1 ? '' : 's'} left · ${tasks.length} total`;
+  }
+
+  addBtn.addEventListener('click', () => {
+    addTask(inputEl.value);
+    inputEl.value = '';
+    inputEl.focus();
+  });
+  inputEl.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ addTask(inputEl.value); inputEl.value = ''; }
+  });
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  clearBtn.addEventListener('click', clearCompleted);
+
+  render();
+</script>
+</body>
+</html>
