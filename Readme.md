@@ -115,5 +115,3 @@ It's a small detail, but handling the singular/plural case (`task` vs `tasks`) i
 
 The interesting part of this project wasn't any single feature — it was keeping the in-memory array, `localStorage`, and the rendered DOM consistently in sync after every single action, without a framework managing that for me. It made me appreciate, in a very hands-on way, what tools like React's state management are actually solving under the hood.
 
-**Live demo:** _add your hosted link here_
-**Source code:** _add your GitHub repo link here_
